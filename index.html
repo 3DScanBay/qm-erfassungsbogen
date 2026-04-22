@@ -249,7 +249,7 @@ body.dark .pageerr{background:#2E0A08;border-color:#6B2020;color:#F0BEBE}
   .two{grid-template-columns:1fr}
   .col-ctx{display:none}
 }
-@media(max-width:500px){
+@media(max-width:600px){
   .g2{grid-template-columns:1fr}
   .sg{grid-template-columns:1fr}
   .blks{grid-template-columns:repeat(2,1fr)}
@@ -780,29 +780,45 @@ function expPDF() {
 (function() {
   var lastFired = 0;
 
-  function onTouch(e) {
-    var el = e.target;
+  function getOnclick(el) {
+    /* Try el.onclick first, then fall back to getAttribute */
+    if (typeof el.onclick === 'function') return el.onclick;
+    var attr = el.getAttribute('onclick');
+    if (attr) {
+      /* Build a function from the attribute string */
+      try { return new Function(attr); } catch(e) { return null; }
+    }
+    return null;
+  }
+
+  function findBtn(el) {
     while (el && el !== document.body) {
-      if (el.tagName === 'BUTTON' && el.onclick) {
-        e.preventDefault();
-        var now = Date.now();
-        if (now - lastFired < 500) return; /* block double-fire */
-        lastFired = now;
-        el.onclick(e);
-        return;
+      if (el.tagName === 'BUTTON') {
+        var fn = getOnclick(el);
+        if (fn) return {el: el, fn: fn};
       }
       el = el.parentNode;
     }
+    return null;
   }
-  document.addEventListener('touchstart', onTouch, {passive: false});
 
-  /* Block the ghost click that follows touchstart within 500ms */
+  document.addEventListener('touchstart', function(e) {
+    var found = findBtn(e.target);
+    if (!found) return;
+    e.preventDefault();
+    var now = Date.now();
+    if (now - lastFired < 500) return;
+    lastFired = now;
+    found.fn.call(found.el, e);
+  }, {passive: false});
+
+  /* Block ghost click within 500ms after touchstart */
   document.addEventListener('click', function(e) {
     if (Date.now() - lastFired < 500) {
       e.stopPropagation();
       e.preventDefault();
     }
-  }, true); /* capture phase — intercepts before onclick fires */
+  }, true);
 })();
 </script>
 </head>
