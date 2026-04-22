@@ -249,8 +249,9 @@ body.dark .pageerr{background:#2E0A08;border-color:#6B2020;color:#F0BEBE}
   .two{grid-template-columns:1fr}
   .col-ctx{display:none}
 }
-@media(max-width:600px){
+@media(max-width:650px){
   .g2{grid-template-columns:1fr}
+  #datum{width:100%}
   .sg{grid-template-columns:1fr}
   .blks{grid-template-columns:repeat(2,1fr)}
   .sig{grid-template-columns:1fr}
@@ -807,14 +808,14 @@ function expPDF() {
     if (!found) return;
     e.preventDefault();
     var now = Date.now();
-    if (now - lastFired < 500) return;
+    if (now - lastFired < 80) return;  /* 80ms = blocks ghost click only */
     lastFired = now;
     found.fn.call(found.el, e);
   }, {passive: false});
 
   /* Block ghost click within 500ms after touchstart */
   document.addEventListener('click', function(e) {
-    if (Date.now() - lastFired < 500) {
+    if (Date.now() - lastFired < 80) {  /* 80ms guard */
       e.stopPropagation();
       e.preventDefault();
     }
