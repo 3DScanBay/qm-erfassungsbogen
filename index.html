@@ -120,6 +120,9 @@ html,body{min-height:100vh;background:var(--bg);color:var(--tx);
 .fld input,.fld textarea{font-family:inherit;font-size:14px;color:var(--tx);
   background:var(--card2);border:1px solid var(--bd);border-radius:8px;
   padding:10px 12px;outline:none;width:100%;transition:border-color .15s,box-shadow .15s}
+/* Safari iOS date input fix */
+input[type="date"]{-webkit-appearance:none;appearance:none;
+  min-width:0;width:100%;display:block} padding:10px 12px;outline:none;width:100%;transition:border-color .15s,box-shadow .15s}
 .fld input:focus,.fld textarea:focus{border-color:var(--red);background:var(--card);
   box-shadow:0 0 0 3px rgba(147,15,3,.09)}
 .fld input::placeholder,.fld textarea::placeholder{color:var(--hi)}
@@ -260,6 +263,117 @@ body.dark .pageerr{background:#2E0A08;border-color:#6B2020;color:#F0BEBE}
   .chip{font-size:14px;height:46px}
   .cbtn{width:42px;height:42px}
 }
+
+/* ══ ANIMATIONS ══════════════════════════════ */
+
+/* 1. Chip bounce on activate */
+@keyframes chipBounce{
+  0%{transform:scale(1)}
+  30%{transform:scale(.86)}
+  60%{transform:scale(1.09)}
+  80%{transform:scale(.97)}
+  100%{transform:scale(1)}
+}
+/* Chip ripple */
+@keyframes rippleOut{to{transform:scale(4);opacity:0}}
+.chip .ripple{position:absolute;border-radius:50%;
+  background:rgba(255,255,255,.32);transform:scale(0);
+  animation:rippleOut .5s linear;pointer-events:none}
+.chip{overflow:hidden;position:relative}
+
+/* 2. Step active pulse ring */
+@keyframes stepPulse{
+  0%{box-shadow:0 0 0 0 rgba(147,15,3,.4)}
+  70%{box-shadow:0 0 0 8px rgba(147,15,3,0)}
+  100%{box-shadow:0 0 0 0 rgba(147,15,3,0)}
+}
+.step.active{animation:stepPulse 1.8s ease infinite}
+.step-line-fill{height:100%;width:0%;background:var(--ok);
+  border-radius:3px;transition:width .5s ease}
+.step-line{overflow:hidden}
+
+/* 3. Input lift on focus */
+.fld input:focus,.fld textarea:focus{
+  border-color:var(--red) !important;
+  background:var(--card) !important;
+  box-shadow:0 0 0 3px rgba(147,15,3,.1);
+  transform:translateY(-1px)}
+.fld input,.fld textarea{transition:border-color .2s,background .2s,
+  box-shadow .2s,transform .15s}
+
+/* 4. Validation shake */
+@keyframes shake{
+  0%,100%{transform:translateY(-1px) translateX(0)}
+  20%{transform:translateY(-1px) translateX(-7px)}
+  40%{transform:translateY(-1px) translateX(7px)}
+  60%{transform:translateY(-1px) translateX(-5px)}
+  80%{transform:translateY(-1px) translateX(4px)}
+}
+@keyframes errSlide{
+  0%{opacity:0;transform:translateX(-8px)}
+  20%{transform:translateX(5px)}
+  40%{transform:translateX(-4px)}
+  60%{transform:translateX(3px)}
+  80%{transform:translateX(-2px)}
+  100%{opacity:1;transform:translateX(0)}
+}
+.fld input.invalid{animation:shake .4s ease}
+.ferr{transition:opacity .2s}
+.ferr.show{animation:errSlide .4s ease forwards}
+
+/* 5. Counter value bump */
+@keyframes cvalBump{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.45)}
+  100%{transform:scale(1)}
+}
+.cval.bump{animation:cvalBump .22s cubic-bezier(.36,.07,.19,.97)}
+.cbtn:hover{background:var(--red-lt) !important;
+  border-color:var(--red-bd) !important;color:var(--red) !important}
+.cbtn:active{transform:scale(.88) !important}
+
+/* 6. Section slide-in */
+@keyframes slideIn{
+  from{opacity:0;transform:translateX(40px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes slideInBack{
+  from{opacity:0;transform:translateX(-40px)}
+  to{opacity:1;transform:translateX(0)}
+}
+.sec.on{animation:slideIn .35s cubic-bezier(.4,0,.2,1)}
+.sec.on.back{animation:slideInBack .35s cubic-bezier(.4,0,.2,1)}
+
+/* 7. Dark mode smooth transition */
+html,body,*{transition:background-color .3s ease,
+  border-color .3s ease,color .15s ease !important}
+/* Exception: inputs/animations should not be slowed */
+.fld input,.fld textarea{
+  transition:border-color .2s,background .2s,box-shadow .2s,
+  transform .15s !important}
+.chip,.step,.btn,.cbtn{transition:all .15s !important}
+
+/* 8. Start button success */
+@keyframes btnSuccess{
+  0%{transform:scale(1)}
+  40%{transform:scale(.95)}
+  70%{transform:scale(1.04)}
+  100%{transform:scale(1)}
+}
+.btn-red:active,.btn-grn:active{transform:scale(.96)}
+.btn-red.success{background:var(--ok) !important;
+  border-color:var(--ok) !important;
+  animation:btnSuccess .4s ease}
+.btn-red.loading{background:var(--mu) !important;
+  border-color:var(--mu) !important;pointer-events:none}
+
+/* Step line between pills */
+.steps{position:relative}
+.step-line{position:absolute;top:23px;height:2px;
+  background:var(--bd);z-index:0}
+.step{position:relative;z-index:1}
+/* ══ END ANIMATIONS ══════════════════════════ */
+
 </style>
 <script>
 
@@ -394,7 +508,10 @@ function gS(i) {
     secs[j].classList.remove('on');
   }
   // Show target
-  document.getElementById('s' + i).classList.add('on');
+  var newSec = document.getElementById('s' + i);
+  newSec.classList.add('on');
+  if (i < cur) newSec.classList.add('back');
+  else newSec.classList.remove('back');
 
   // Mark done
   if (i > 0 && doneSteps.indexOf(cur) < 0) {
@@ -419,12 +536,28 @@ function gS(i) {
 }
 
 // ── Chips ──
+function addRipple(el) {
+  var r = document.createElement('span');
+  r.className = 'ripple';
+  var s = Math.max(el.offsetWidth, el.offsetHeight);
+  r.style.cssText = 'width:'+s+'px;height:'+s+'px;left:'+((el.offsetWidth-s)/2)+'px;top:'+((el.offsetHeight-s)/2)+'px';
+  el.appendChild(r);
+  setTimeout(function(){ r.remove(); }, 600);
+}
 function pickChip(group, idx) {
   chipState[group] = idx;
   var ids = chipGroups[group];
   for (var j = 0; j < ids.length; j++) {
     var el = document.getElementById(ids[j]);
-    if (el) el.classList.toggle('on', j === idx);
+    if (!el) continue;
+    var wasOn = el.classList.contains('on');
+    el.classList.toggle('on', j === idx);
+    if (j === idx && !wasOn) {
+      addRipple(el);
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = 'chipBounce .3s cubic-bezier(.36,.07,.19,.97)';
+    }
   }
   /* Clear chip error on selection */
   var errMap = {rev:'e-rev',norm:'e-norm',geb:'e-geb',plan:'e-plan',denk:'e-denk',mst:'e-mst',rl:null};
@@ -435,7 +568,14 @@ function pickChip(group, idx) {
 }
 
 function togChip(el) {
+  var wasOn = el.classList.contains('on');
   el.classList.toggle('on');
+  if (!wasOn) {
+    addRipple(el);
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = 'chipBounce .3s cubic-bezier(.36,.07,.19,.97)';
+  }
 }
 
 function getChipVal(group) {
@@ -466,6 +606,8 @@ function adj(id, d) {
   var v = Math.max(0, parseInt(el.textContent) + d);
   el.textContent = v;
   el.className = 'cval' + (v === 0 ? ' z' : '');
+  el.classList.add('bump');
+  setTimeout(function(){ el.classList.remove('bump'); }, 250);
   var sn = parseInt(document.getElementById('vsn').textContent);
   document.getElementById('sn-warn').style.display = sn === 0 ? 'block' : 'none';
 }
@@ -613,6 +755,29 @@ function setLang(l) {
 
 
 // ── Toast ──
+function startQM(btn) {
+  btn.classList.add('loading');
+  var orig = btn.textContent;
+  btn.textContent = 'Wird gestartet...';
+  var dots = 0;
+  var iv = setInterval(function(){
+    dots = (dots+1)%4;
+    btn.textContent = 'Wird gestartet' + '.'.repeat(dots);
+  }, 300);
+  setTimeout(function(){
+    clearInterval(iv);
+    expChat();
+    expPDF();
+    btn.classList.remove('loading');
+    btn.classList.add('success');
+    btn.textContent = '✓ Gestartet!';
+    setTimeout(function(){
+      btn.classList.remove('success');
+      btn.textContent = orig;
+    }, 2500);
+  }, 1200);
+}
+
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -849,9 +1014,13 @@ function expPDF() {
 <!-- Step pills -->
 <div class="steps">
   <button class="step active" id="sp0" onclick="gS(0)"><span class="step-n">1</span><span class="step-l" id="sl0" data-de="Projektdaten" data-tr="Proje Verisi">Projektdaten</span></button>
+  <div class="step-line"><div class="step-line-fill"></div></div>
   <button class="step" id="sp1" onclick="gS(1)"><span class="step-n">2</span><span class="step-l" id="sl1" data-de="Normen & Typ" data-tr="Norm & Tip">Normen &amp; Typ</span></button>
+  <div class="step-line"><div class="step-line-fill"></div></div>
   <button class="step" id="sp2" onclick="gS(2)"><span class="step-n">3</span><span class="step-l" id="sl2" data-de="Planset" data-tr="Plan Seti">Planset</span></button>
+  <div class="step-line"><div class="step-line-fill"></div></div>
   <button class="step" id="sp3" onclick="gS(3)"><span class="step-n">4</span><span class="step-l" id="sl3" data-de="Konstruktion" data-tr="Yapım">Konstruktion</span></button>
+  <div class="step-line"><div class="step-line-fill"></div></div>
   <button class="step" id="sp4" onclick="gS(4);bldSum()"><span class="step-n">5</span><span class="step-l" id="sl4" data-de="Freigabe" data-tr="Onay">Freigabe</span></button>
 </div>
 
@@ -1144,7 +1313,7 @@ function expPDF() {
   <div class="nav" style="margin-top:12px">
     <button class="btn" onclick="gS(3)">← Zurück</button>
     <span class="si" id="si4" data-de="Schritt 5 von 5" data-tr="Adım 5 / 5">Schritt 5 von 5</span>
-    <button class="btn btn-green" onclick="expChat();expPDF()"><span id="lb-start" data-de="✓ QM-Prüfung starten" data-tr="✓ QM Kontrolünü Başlat">✓ QM-Prüfung starten</span></button>
+    <button class="btn btn-green" onclick="startQM(this)" id="btn-start-qm"><span id="lb-start" data-de="✓ QM-Prüfung starten" data-tr="✓ QM Kontrolünü Başlat">✓ QM-Prüfung starten</span></button>
   </div>
 </div>
 
