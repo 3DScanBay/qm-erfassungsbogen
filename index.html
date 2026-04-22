@@ -290,7 +290,8 @@ body.dark .pageerr{background:#2E0A08;border-color:#6B2020;color:#F0BEBE}
 .step.active{animation:stepPulse 1.8s ease infinite}
 .step-line-fill{height:100%;width:0%;background:var(--ok);
   border-radius:3px;transition:width .5s ease}
-.step-line{overflow:hidden}
+.step-line{height:2px;flex:1;background:var(--bd);border-radius:3px;
+  overflow:hidden;align-self:center;min-width:4px}
 
 /* 3. Input lift on focus */
 .fld input:focus,.fld textarea:focus{
@@ -523,12 +524,23 @@ function gS(i) {
   var pct = [20,40,60,80,100];
   document.getElementById('prog').style.width = pct[i] + '%';
 
-  // Step pills
+  // Step pills + line fills
   var pills = document.querySelectorAll('.step');
+  var fills = document.querySelectorAll('.step-line-fill');
   for (var j = 0; j < pills.length; j++) {
     pills[j].classList.remove('active','done');
     if (j === i) pills[j].classList.add('active');
     else if (doneSteps.indexOf(j) >= 0) pills[j].classList.add('done');
+    /* Update step number — show ✓ when done */
+    var numEl = pills[j].querySelector('.step-n');
+    if (numEl) {
+      if (doneSteps.indexOf(j) >= 0) numEl.textContent = '✓';
+      else numEl.textContent = j + 1;
+    }
+  }
+  /* Animate line fills between pills */
+  for (var j = 0; j < fills.length; j++) {
+    fills[j].style.width = (j < i) ? '100%' : '0%';
   }
 
   // Scroll to top
