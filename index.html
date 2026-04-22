@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>QM Erfassungsbogen — 3DSCAN Solutions GmbH</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#930F03;--red-dk:#6B0A02;--red-lt:#FDECEA;--red-bd:#E8A09A;
+  --navy:#1B3A5C;
+  --bg:#EDEEF1;--card:#fff;--card2:#F4F5F8;
+  --bd:#E0E2E8;--bd2:#CDD0D8;
+  --tx:#1A1D23;--mu:#6B7280;--hi:#9CA3AF;
+  --ok:#2D6A1F;--ok-bg:#F0FAE8;--ok-bd:#A8D580;
+  --wa-bg:#FEF3C7;--wa-bd:#FCD34D;--wa-tx:#92400E;
+  --in-bg:#EFF6FF;--in-bd:#BFDBFE;--in-tx:#1E40AF;
+  --ch:#F4F5F8;--ch-hv:#FFF0EF;
+  --ctx:#F8F4F3;--ctx-bd:#F0D5D2;
+  --ex:#1B3A5C;--ex-hv:#122840;
+}
+.dark{
+  --bg:#0A0C12;--card:#14171F;--card2:#1C2030;
+  --bd:#2A2E40;--bd2:#363B52;
+  --tx:#E4E6F0;--mu:#8089A8;--hi:#525870;
+  --ch:#1C2030;--ch-hv:#2A1010;
+  --ctx:#1A1010;--ctx-bd:#3D1A18;
+  --red-lt:#2E0A08;--red-bd:#5A1510;
+  --ok-bg:#111E0D;--ok-bd:#2D6A1F;
+  --wa-bg:#1F1700;--wa-bd:#6B4E00;--wa-tx:#FCD34D;
+  --in-bg:#080F22;--in-bd:#1A2E5C;--in-tx:#7BA8F0;
+  --ex:#930F03;--ex-hv:#6B0A02;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--tx);
+  font-family:system-ui,-apple-system,sans-serif;transition:background .2s,color .2s}
+.app{max-width:960px;margin:0 auto;padding:14px 12px 80px}
+
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;
+  background:var(--card);border:1px solid var(--bd);border-radius:14px;
+  padding:11px 16px;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+.logo{height:40px;width:auto;border-radius:5px}
+.hdr-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* Language toggle */
+.ltog{display:flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden}
+.lbtn{font-family:inherit;font-size:12px;font-weight:600;padding:6px 12px;
+  border:none;background:var(--card2);color:var(--mu);cursor:pointer;
+  transition:all .15s;min-height:36px;touch-action:manipulation}
+.lbtn:first-child{border-right:1px solid var(--bd2)}
+.lbtn.on{background:var(--red);color:#fff}
+
+/* Dark mode toggle */
+.dtog{display:flex;align-items:center;gap:7px;cursor:pointer;
+  padding:6px 10px;border:1px solid var(--bd2);border-radius:8px;
+  background:var(--card2);min-height:36px;touch-action:manipulation;
+  user-select:none;transition:background .15s}
+.dtog:hover{background:var(--bd)}
+.dtog-lbl{font-size:12px;font-weight:600;color:var(--mu)}
+.dtog-trk{width:34px;height:19px;background:var(--bd2);border-radius:10px;
+  position:relative;transition:background .25s;flex-shrink:0}
+.dark .dtog-trk{background:var(--red)}
+.dtog-knob{width:13px;height:13px;background:#fff;border-radius:50%;
+  position:absolute;top:3px;left:3px;transition:transform .25s;
+  box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.dark .dtog-knob{transform:translateX(15px)}
+
+/* Progress */
+.prog-trk{background:var(--bd);border-radius:4px;height:4px;margin-bottom:12px;overflow:hidden}
+.prog-fill{height:100%;background:var(--red);border-radius:4px;transition:width .35s ease}
+
+/* Step pills */
+.steps{display:flex;gap:4px;margin-bottom:14px}
+.step{flex:1;min-height:46px;padding:7px 3px;border-radius:9px;
+  border:1px solid var(--bd);background:var(--card);
+  cursor:pointer;font-family:inherit;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:all .15s;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent}
+.step:hover{border-color:var(--red)}
+.step.active{background:var(--red);border-color:var(--red)}
+.step.done{background:var(--ok-bg);border-color:var(--ok-bd)}
+.step-n{font-size:11px;font-weight:700;color:var(--hi)}
+.step.active .step-n{color:rgba(255,255,255,.8)}
+.step.done .step-n{color:var(--ok)}
+.step-l{font-size:10px;color:var(--hi);margin-top:1px;line-height:1.2}
+.step.active .step-l{color:#fff;font-weight:500}
+.step.done .step-l{color:var(--ok);font-weight:500}
+
+/* Layout */
+.two{display:grid;grid-template-columns:1fr 220px;gap:10px;align-items:start}
+.col-ctx{display:flex;flex-direction:column;gap:10px}
+.col-main{display:flex;flex-direction:column;gap:10px}
+
+/* Card */
+.card{background:var(--card);border:1px solid var(--bd);border-radius:13px;padding:16px 18px}
+.card-h{font-size:11px;font-weight:600;color:var(--mu);letter-spacing:.07em;
+  text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.card-h::after{content:"";flex:1;height:1px;background:var(--bd)}
+.card-desc{font-size:12.5px;color:var(--mu);line-height:1.6;margin-bottom:13px}
+.card-hint{font-size:12px;color:var(--mu);line-height:1.55;margin-bottom:11px;
+  background:var(--card2);border-radius:7px;padding:8px 11px;border:1px solid var(--bd)}
+.req{color:var(--red);margin-left:2px}
+
+/* Context card */
+.ctx{background:var(--ctx);border:1px solid var(--ctx-bd);border-radius:13px;padding:14px 16px}
+.ctx-h{font-size:11px;font-weight:700;color:var(--red);letter-spacing:.05em;
+  text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.ctx-h svg{width:13px;height:13px;stroke:var(--red);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.ctx-body{font-size:12.5px;color:var(--mu);line-height:1.65}
+.ctx-body strong{color:var(--tx);font-weight:600}
+.ctx-list{margin-top:7px;display:flex;flex-direction:column;gap:5px}
+.ctx-item{display:flex;gap:7px;font-size:12px;color:var(--mu);line-height:1.5;align-items:flex-start}
+.ctx-dot{width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px}
+
+/* Fields */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:12px;font-weight:500;color:var(--mu)}
+.fld input,.fld textarea{font-family:inherit;font-size:14px;color:var(--tx);
+  background:var(--card2);border:1px solid var(--bd);border-radius:8px;
+  padding:10px 12px;outline:none;width:100%;transition:border-color .15s,box-shadow .15s}
+.fld input:focus,.fld textarea:focus{border-color:var(--red);background:var(--card);
+  box-shadow:0 0 0 3px rgba(147,15,3,.09)}
+.fld input::placeholder,.fld textarea::placeholder{color:var(--hi)}
+.fld textarea{resize:vertical;min-height:88px;line-height:1.55}
+
+/* Chips — real buttons, large touch targets */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-family:inherit;font-size:13px;font-weight:400;
+  padding:0 16px;height:42px;border-radius:21px;
+  border:1px solid var(--bd2);background:var(--ch);color:var(--tx);
+  cursor:pointer;line-height:1;display:inline-flex;align-items:center;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  -webkit-appearance:none;appearance:none;outline:none}
+.chip:hover{border-color:var(--red);color:var(--red);background:var(--ch-hv)}
+.chip:active{transform:scale(.94)}
+.chip.on{background:var(--red);border-color:var(--red);color:#fff;font-weight:500}
+
+/* Counters */
+.ctr{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)}
+.ctr:last-child{border-bottom:none;padding-bottom:3px}
+.ctr-i{flex:1}
+.ctr-name{font-size:13.5px;font-weight:500;color:var(--tx)}
+.ctr-sub{font-size:11px;color:var(--mu);margin-top:1px}
+.ctr-ctrl{display:flex;align-items:center;gap:10px}
+.cbtn{font-family:inherit;width:38px;height:38px;border-radius:8px;
+  border:1px solid var(--bd2);background:var(--card);color:var(--tx);
+  font-size:20px;font-weight:300;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-appearance:none;appearance:none;outline:none}
+.cbtn:hover{background:var(--red);border-color:var(--red);color:#fff}
+.cbtn:active{transform:scale(.9)}
+.cval{font-size:17px;font-weight:600;min-width:28px;text-align:center;
+  color:var(--tx);font-variant-numeric:tabular-nums}
+.cval.z{color:var(--bd2)}
+
+/* Alerts */
+.info{background:var(--in-bg);border:1px solid var(--in-bd);border-radius:8px;
+  padding:10px 13px;font-size:12.5px;color:var(--in-tx);line-height:1.55;margin-top:9px}
+.warn{background:var(--wa-bg);border:1px solid var(--wa-bd);border-radius:8px;
+  padding:10px 13px;font-size:12.5px;color:var(--wa-tx);line-height:1.55;margin-top:9px}
+
+/* Nav buttons — OUTSIDE two-col, full width row */
+.nav{display:flex;align-items:center;justify-content:space-between;
+  margin-top:12px;gap:8px}
+.si{font-size:12px;color:var(--mu);font-weight:500}
+
+/* All buttons */
+.btn{font-family:inherit;font-size:13.5px;font-weight:500;
+  padding:0 22px;height:46px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--bd2);background:var(--card);color:var(--tx);
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .15s;white-space:nowrap;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-appearance:none;appearance:none;outline:none}
+.btn:hover{background:var(--card2)}.btn:active{transform:scale(.97)}
+.btn-red{background:var(--red);border-color:var(--red);color:#fff}
+.btn-red:hover{background:var(--red-dk);border-color:var(--red-dk)}
+.btn-green{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn-green:hover{background:#235518}
+.btn-navy{background:var(--ex);border-color:var(--ex);color:#fff}
+.btn-navy:hover{background:var(--ex-hv)}
+.btn-row{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.btn-full{width:100%}
+
+/* Summary */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.sc{background:var(--card);border:1px solid var(--bd);border-radius:13px;overflow:hidden}
+.sch{padding:9px 14px;font-size:10px;font-weight:700;color:#fff;letter-spacing:.07em;text-transform:uppercase}
+.scb{padding:5px 14px 9px}
+.sr{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:12.5px;padding:4px 0;border-bottom:1px solid var(--bd)}
+.sr:last-child{border-bottom:none}
+.sk{color:var(--mu)}.sv{font-weight:500;color:var(--tx);text-align:right;max-width:58%;word-break:break-word}
+.sv.miss{color:var(--red)}
+.blks{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}
+.blk{padding:8px 4px;border-radius:8px;font-size:11px;font-weight:600;color:#fff;text-align:center;line-height:1.4}
+.sig{display:grid;grid-template-columns:1fr 1.6fr 1.6fr;gap:14px;margin-top:7px}
+.sig-f{display:flex;flex-direction:column;gap:7px}
+.sig-l{font-size:11px;color:var(--mu);font-weight:500}
+.sig-line{height:38px;border-bottom:1.5px solid var(--tx)}
+
+/* Export */
+.exbox{background:var(--card);border:1px solid var(--red-bd);border-radius:13px;padding:16px 18px;margin-top:10px}
+.exh{font-size:11px;font-weight:700;color:var(--red);letter-spacing:.07em;
+  text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.exh::after{content:"";flex:1;height:1px;background:var(--red-bd)}
+.exd{font-size:12.5px;color:var(--mu);line-height:1.65;margin-bottom:13px}
+kbd{background:var(--card2);color:var(--mu);padding:1px 5px;
+  border-radius:4px;font-size:11px;font-family:monospace;border:1px solid var(--bd2)}
+
+/* Version */
+.ver{position:fixed;bottom:9px;right:12px;font-size:10px;
+  color:var(--hi);pointer-events:none;z-index:50;letter-spacing:.03em}
+
+/* Toast */
+.toast{position:fixed;bottom:26px;left:50%;
+  transform:translateX(-50%) translateY(14px);
+  background:var(--tx);color:var(--bg);padding:11px 20px;border-radius:9px;
+  font-size:13px;font-weight:500;opacity:0;transition:all .3s;
+  pointer-events:none;z-index:9999;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Sections */
+.sec{display:none}.sec.on{display:block}
+
+/* Validation errors */
+.ferr{display:none;align-items:center;gap:6px;background:#FDECEA;border:1px solid #F0BEBE;
+  border-radius:7px;padding:8px 11px;font-size:12px;color:#7A1F1F;font-weight:500;margin-top:6px}
+.ferr.show{display:flex}
+.ferr::before{content:"⚠";font-size:13px;flex-shrink:0}
+body.dark .ferr{background:#2E0A08;border-color:#6B2020;color:#F0BEBE}
+.pageerr{display:none;background:#FDECEA;border:1px solid #F0BEBE;border-radius:10px;
+  padding:13px 16px;font-size:13px;color:#7A1F1F;font-weight:600;
+  margin-bottom:12px;text-align:center}
+.pageerr.show{display:block}
+body.dark .pageerr{background:#2E0A08;border-color:#6B2020;color:#F0BEBE}
+.fld input.invalid,.fld textarea.invalid{border-color:#930F03}
+.fld input.invalid:focus,.fld textarea.invalid:focus{border-color:#930F03;box-shadow:0 0 0 3px rgba(147,15,3,.15)}
+
+/* Responsive */
+@media(max-width:520px){
+  .two{grid-template-columns:1fr}
+  .col-ctx{display:none}
+}
+@media(max-width:500px){
+  .g2{grid-template-columns:1fr}
+  .sg{grid-template-columns:1fr}
+  .blks{grid-template-columns:repeat(2,1fr)}
+  .sig{grid-template-columns:1fr}
+  .step-l{display:none}
+  .app{padding:10px 10px 80px}
+  .chip{font-size:14px;height:46px}
+  .cbtn{width:42px;height:42px}
+}
+</style>
+<script>
+
+/* ── Fix C: toggleDark alias (old onclick references still use this name) ── */
+function toggleDark() { dm(); }
+function dm() {
+  dark = !dark;
+  document.body.classList.toggle('dark', dark);
+  var lbl = document.getElementById('dtog-lbl');
+  if (lbl) lbl.textContent = dark ? 'Light' : 'Dark';
+}
+
+// ── State ──
+var cur = 0;
+var doneSteps = [];
+var lang = 'de';
+var dark = false;
+
+// Chip state: group -> selected index (or array for multi)
+var chipState = {rev:-1, norm:-1, geb:-1, plan:-1, denk:-1, mst:-1, rl:-1};
+var chipGroups = {
+  rev:  ['ch-re0','ch-re1','ch-re2','ch-re3'],
+  norm: ['ch-n0','ch-n1'],
+  geb:  ['ch-g0','ch-g1','ch-g2','ch-g3','ch-g4','ch-g5'],
+  plan: ['ch-p0','ch-p1','ch-p2','ch-p3','ch-p4'],
+  denk: ['ch-d0','ch-d1','ch-d2'],
+  mst:  ['ch-m0','ch-m1','ch-m2','ch-m3','ch-m4'],
+  rl:   ['ch-rl0','ch-rl1','ch-rl2','ch-rl3','ch-rl4']
+};
+var chipValues = {
+  rev:  ['RE00 — Erstlieferung','RE01 — 1. Korrektur','RE02 — 2. Korrektur','RE03+'],
+  norm: ['DIN 277','WoFlV'],
+  geb:  ['EFH','MFH','Gewerbe','Büro / Verwaltung','Sonderbau','Industrie'],
+  plan: ['Bestand / Digitalisierung','Entwurf','LPH 3','LPH 4','LPH 5'],
+  denk: ['Nein','Ja','Ensemble'],
+  mst:  ['1:200','1:100','1:50','1:20+','Gemischt'],
+  rl:   ['Ja — motorisiert','Ja — manuell','Teilweise','Nein','Unbekannt']
+};
+
+// ── Dark Mode ──
+
+
+// ── Navigation ──
+function clearErr(errId, input) {
+  var er = document.getElementById(errId);
+  if (er && input && input.value.trim()) {
+    er.className = 'ferr';
+    input.classList.remove('invalid');
+  }
+}
+
+function validate(step) {
+  var ok = true;
+
+  /* Hide all errors for this step first */
+  var errIds = {
+    0: ['e-pnr','e-dat','e-ag','e-pr','e-rev'],
+    1: ['e-norm','e-geb','e-plan','e-denk'],
+    2: ['e-mst'],
+    3: ['e-be']
+  };
+  var ids = errIds[step] || [];
+  for (var i = 0; i < ids.length; i++) {
+    var el = document.getElementById(ids[i]);
+    if (el) el.className = 'ferr';
+  }
+  /* Hide inputs invalid state */
+  var inputs = ['projnr','datum','auftrg','pruefer','besond'];
+  for (var i = 0; i < inputs.length; i++) {
+    var inp = document.getElementById(inputs[i]);
+    if (inp) inp.classList.remove('invalid');
+  }
+
+  function showErr(id, inputId) {
+    var el = document.getElementById(id);
+    if (el) el.className = 'ferr show';
+    if (inputId) {
+      var inp = document.getElementById(inputId);
+      if (inp) inp.classList.add('invalid');
+    }
+    ok = false;
+  }
+
+  if (step === 0) {
+    var pnr = document.getElementById('projnr');
+    var dat = document.getElementById('datum');
+    var ag  = document.getElementById('auftrg');
+    var pr  = document.getElementById('pruefer');
+    if (!pnr || !pnr.value.trim()) showErr('e-pnr', 'projnr');
+    if (!dat || !dat.value.trim()) showErr('e-dat', 'datum');
+    if (!ag  || !ag.value.trim())  showErr('e-ag',  'auftrg');
+    if (!pr  || !pr.value.trim())  showErr('e-pr',  'pruefer');
+    if (chipState['rev'] < 0)      showErr('e-rev', null);
+  }
+  if (step === 1) {
+    if (chipState['norm'] < 0)  showErr('e-norm', null);
+    if (chipState['geb']  < 0)  showErr('e-geb',  null);
+    if (chipState['plan'] < 0)  showErr('e-plan', null);
+    if (chipState['denk'] < 0)  showErr('e-denk', null);
+  }
+  if (step === 2) {
+    if (chipState['mst'] < 0) showErr('e-mst', null);
+  }
+  if (step === 3) {
+    var be = document.getElementById('besond');
+    if (!be || !be.value.trim()) showErr('e-be', 'besond');
+  }
+
+  /* Show / hide page banner */
+  var pe = document.getElementById('pe' + step);
+  if (pe) {
+    pe.className = ok ? 'pageerr' : 'pageerr show';
+    if (!ok) {
+      /* Auto-hide banner after 5s */
+      setTimeout(function() {
+        if (pe) pe.className = 'pageerr';
+      }, 5000);
+      /* Scroll to top so banner is visible */
+      window.scrollTo(0, 0);
+    }
+  }
+  return ok;
+}
+
+function gS(i) {
+  /* Only validate when moving FORWARD */
+  if (i > cur) {
+    if (!validate(cur)) return;
+  }
+  var secs = document.querySelectorAll('.sec');
+  for (var j = 0; j < secs.length; j++) {
+    secs[j].classList.remove('on');
+  }
+  // Show target
+  document.getElementById('s' + i).classList.add('on');
+
+  // Mark done
+  if (i > 0 && doneSteps.indexOf(cur) < 0) {
+    doneSteps.push(cur);
+  }
+  cur = i;
+
+  // Progress bar
+  var pct = [20,40,60,80,100];
+  document.getElementById('prog').style.width = pct[i] + '%';
+
+  // Step pills
+  var pills = document.querySelectorAll('.step');
+  for (var j = 0; j < pills.length; j++) {
+    pills[j].classList.remove('active','done');
+    if (j === i) pills[j].classList.add('active');
+    else if (doneSteps.indexOf(j) >= 0) pills[j].classList.add('done');
+  }
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// ── Chips ──
+function pickChip(group, idx) {
+  chipState[group] = idx;
+  var ids = chipGroups[group];
+  for (var j = 0; j < ids.length; j++) {
+    var el = document.getElementById(ids[j]);
+    if (el) el.classList.toggle('on', j === idx);
+  }
+  /* Clear chip error on selection */
+  var errMap = {rev:'e-rev',norm:'e-norm',geb:'e-geb',plan:'e-plan',denk:'e-denk',mst:'e-mst',rl:null};
+  if (errMap[group]) {
+    var er = document.getElementById(errMap[group]);
+    if (er) er.className = 'ferr';
+  }
+}
+
+function togChip(el) {
+  el.classList.toggle('on');
+}
+
+function getChipVal(group) {
+  var idx = chipState[group];
+  if (idx < 0) return '—';
+  return chipValues[group][idx] || '—';
+}
+
+function getMultiChips(prefix, max) {
+  var vals = [];
+  for (var j = 0; j < max; j++) {
+    var el = document.getElementById(prefix + j);
+    if (el && el.classList.contains('on')) {
+      vals.push(el.textContent.trim());
+    }
+  }
+  return vals.length ? vals.join(', ') : '—';
+}
+
+// ── Denkmal ──
+function denkShow(show) {
+  document.getElementById('denk-info').style.display = show ? 'block' : 'none';
+}
+
+// ── Counter ──
+function adj(id, d) {
+  var el = document.getElementById(id);
+  var v = Math.max(0, parseInt(el.textContent) + d);
+  el.textContent = v;
+  el.className = 'cval' + (v === 0 ? ' z' : '');
+  var sn = parseInt(document.getElementById('vsn').textContent);
+  document.getElementById('sn-warn').style.display = sn === 0 ? 'block' : 'none';
+}
+
+// ── Data ──
+function fv(id) { var el = document.getElementById(id); return el ? el.value.trim() || '—' : '—'; }
+function cn(id) { var el = document.getElementById(id); return el ? el.textContent : '0'; }
+
+function getData() {
+  return {
+    projektnummer: fv('projnr'),
+    auftraggeber:  fv('auftrg'),
+    pruefer:       fv('pruefer'),
+    datum:         fv('datum'),
+    revision:      getChipVal('rev'),
+    norm:          getChipVal('norm'),
+    gebaeudetyp:   getChipVal('geb'),
+    plantyp:       getChipVal('plan'),
+    denkmalschutz: getChipVal('denk'),
+    massstab:      getChipVal('mst'),
+    grundrisse:    cn('vgr'),
+    schnitte:      cn('vsn'),
+    ansichten:     cn('van'),
+    detailplaene:  cn('vdet'),
+    lageplaene:    cn('vlag'),
+    zargentyp:     getMultiChips('ch-z', 5),
+    fenstertyp:    getMultiChips('ch-f', 6),
+    wandkonstruktion: getMultiChips('ch-w', 7),
+    rollladen:     getChipVal('rl'),
+    besonderheiten: (document.getElementById('besond').value.trim() || '—')
+  };
+}
+
+// ── Summary ──
+function bldSum() {
+  var d = getData();
+  var hasDenk = (d.denkmalschutz !== 'Nein' && d.denkmalschutz !== '—' && d.denkmalschutz !== 'Hayır');
+
+  function sv(v, req) {
+    var miss = req && v === '—';
+    return '<span class="sv' + (miss ? ' miss' : '') + '">' + v + '</span>';
+  }
+
+  document.getElementById('sum-grid').innerHTML =
+    '<div class="sc"><div class="sch" style="background:#930F03">Projektdaten</div><div class="scb">' +
+    '<div class="sr"><span class="sk">Projektnummer</span>' + sv(d.projektnummer,true) + '</div>' +
+    '<div class="sr"><span class="sk">Auftraggeber</span>' + sv(d.auftraggeber,true) + '</div>' +
+    '<div class="sr"><span class="sk">Prüfer</span>' + sv(d.pruefer,true) + '</div>' +
+    '<div class="sr"><span class="sk">Datum</span>' + sv(d.datum,true) + '</div>' +
+    '<div class="sr"><span class="sk">Revision</span>' + sv(d.revision,true) + '</div>' +
+    '</div></div>' +
+    '<div class="sc"><div class="sch" style="background:#1B3A5C">Normen & Typ</div><div class="scb">' +
+    '<div class="sr"><span class="sk">Norm</span>' + sv(d.norm,true) + '</div>' +
+    '<div class="sr"><span class="sk">Gebäudetyp</span>' + sv(d.gebaeudetyp,true) + '</div>' +
+    '<div class="sr"><span class="sk">Plantyp</span>' + sv(d.plantyp,true) + '</div>' +
+    '<div class="sr"><span class="sk">Denkmalschutz</span>' + sv(d.denkmalschutz,true) + '</div>' +
+    '<div class="sr"><span class="sk">Maßstab</span>' + sv(d.massstab,true) + '</div>' +
+    '</div></div>' +
+    '<div class="sc"><div class="sch" style="background:#3B6D11">Planset</div><div class="scb">' +
+    '<div class="sr"><span class="sk">Grundrisse</span><span class="sv">' + d.grundrisse + ' Blatt</span></div>' +
+    '<div class="sr"><span class="sk">Schnitte</span><span class="sv">' + d.schnitte + ' Blatt</span></div>' +
+    '<div class="sr"><span class="sk">Ansichten</span><span class="sv">' + d.ansichten + ' Blatt</span></div>' +
+    '<div class="sr"><span class="sk">Detailpläne</span><span class="sv">' + d.detailplaene + ' Blatt</span></div>' +
+    '<div class="sr"><span class="sk">Lagepläne</span><span class="sv">' + d.lageplaene + ' Blatt</span></div>' +
+    '</div></div>' +
+    '<div class="sc"><div class="sch" style="background:#534AB7">Konstruktion</div><div class="scb">' +
+    '<div class="sr"><span class="sk">Zargen</span><span class="sv">' + d.zargentyp + '</span></div>' +
+    '<div class="sr"><span class="sk">Fenstertyp</span><span class="sv">' + d.fenstertyp + '</span></div>' +
+    '<div class="sr"><span class="sk">Wand</span><span class="sv">' + d.wandkonstruktion + '</span></div>' +
+    '<div class="sr"><span class="sk">Rollladen</span><span class="sv">' + d.rollladen + '</span></div>' +
+    '<div class="sr"><span class="sk">Besonderheiten</span><span class="sv">' + (d.besonderheiten !== '—' ? 'Eingetragen ✓' : '—') + '</span></div>' +
+    '</div></div>';
+
+  document.getElementById('sum-blks').innerHTML =
+    '<div class="blk" style="background:#930F03">Block A<br><span style="font-size:10px;opacity:.8">Geometrie</span></div>' +
+    '<div class="blk" style="background:#3B6D11">Block B<br><span style="font-size:10px;opacity:.8">Planinhalt</span></div>' +
+    '<div class="blk" style="background:#534AB7">Block C<br><span style="font-size:10px;opacity:.8">' + (hasDenk ? 'Bestand+Denkmal' : 'Bestand') + '</span></div>' +
+    '<div class="blk" style="background:#2C2C2A">Block D<br><span style="font-size:10px;opacity:.8">Übergreifend</span></div>';
+
+  var w = [];
+  if (d.projektnummer === '—') w.push('Projektnummer fehlt');
+  if (d.auftraggeber === '—') w.push('Auftraggeber fehlt');
+  if (d.norm === '—') w.push('Norm nicht gewählt');
+  if (d.revision === '—') w.push('Revisionsstand fehlt');
+  if (d.massstab === '—') w.push('Maßstab fehlt');
+  if (d.besonderheiten === '—') w.push('Besonderheiten leer');
+  if (parseInt(d.schnitte) === 0) w.push('Keine Schnitte angegeben');
+  document.getElementById('sum-warns').innerHTML = w.length
+    ? '<div class="warn"><strong>Offene Punkte:</strong> ' + w.join(' · ') + '</div>' : '';
+}
+
+// ── Language ──
+var LANG = 'de';
+
+function setLang(l) {
+  LANG = l;
+  var btnDE = document.getElementById('btn-de');
+  var btnTR = document.getElementById('btn-tr');
+  if(btnDE) btnDE.className = 'lbtn' + (l==='de' ? ' on' : '');
+  if(btnTR) btnTR.className = 'lbtn' + (l==='tr' ? ' on' : '');
+
+  /* Single loop: translate every element with data-de / data-tr */
+  var els = document.querySelectorAll('[data-de]');
+  for(var i = 0; i < els.length; i++) {
+    var el  = els[i];
+    var val = el.getAttribute('data-' + l);
+    if(val === null) continue;
+    var tag = el.tagName.toLowerCase();
+
+    if(tag === 'label') {
+      /* Labels have a req <span>* inside — rebuild */
+      var hasReq = el.querySelector('.req') !== null;
+      el.textContent = val;
+      if(hasReq) {
+        var sp = document.createElement('span');
+        sp.className = 'req';
+        sp.textContent = ' *';
+        el.appendChild(sp);
+      }
+    } else if(el.querySelector('span[id]')) {
+      /* Card headers with named child spans (Mehrfachauswahl etc.)
+         Set only the first text node, leave child spans intact */
+      var node = el.firstChild;
+      while(node && node.nodeType !== 3) node = node.nextSibling;
+      if(node) {
+        node.nodeValue = val + ' ';
+      } else {
+        var tn = document.createTextNode(val + ' ');
+        el.insertBefore(tn, el.firstChild);
+      }
+    } else {
+      /* Everything else: innerHTML handles <strong>, &amp; etc. */
+      el.innerHTML = val;
+    }
+  }
+
+  /* Placeholders */
+  var inputs = document.querySelectorAll('[data-ph-de]');
+  for(var i = 0; i < inputs.length; i++) {
+    var inp = inputs[i];
+    var ph  = inp.getAttribute('data-ph-' + l);
+    if(ph !== null) inp.placeholder = ph;
+  }
+}
+
+
+// ── Toast ──
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+// ── Export Chat ──
+function expChat() {
+  var d = getData();
+  var txt = [
+    '=== QM-PROJEKTERFASSUNGSBOGEN 3DSCAN ===', '',
+    '--- PROJEKTDATEN ---',
+    'Projektnummer:    ' + d.projektnummer,
+    'Auftraggeber:     ' + d.auftraggeber,
+    'Prüfer:           ' + d.pruefer,
+    'Datum:            ' + d.datum,
+    'Revisionsstand:   ' + d.revision, '',
+    '--- NORMEN & KLASSIFIKATION ---',
+    'Flächennorm:      ' + d.norm,
+    'Gebäudetyp:       ' + d.gebaeudetyp,
+    'Plantyp:          ' + d.plantyp,
+    'Denkmalschutz:    ' + d.denkmalschutz,
+    'Maßstab:          ' + d.massstab, '',
+    '--- PLANSET ---',
+    'Grundrisse:       ' + d.grundrisse + ' Blatt',
+    'Schnitte:         ' + d.schnitte + ' Blatt',
+    'Ansichten:        ' + d.ansichten + ' Blatt',
+    'Detailpläne:      ' + d.detailplaene + ' Blatt',
+    'Lagepläne:        ' + d.lageplaene + ' Blatt', '',
+    '--- KONSTRUKTION ---',
+    'Zargentyp:        ' + d.zargentyp,
+    'Fenstertyp:       ' + d.fenstertyp,
+    'Wandkonstruktion: ' + d.wandkonstruktion,
+    'Rollladen:        ' + d.rollladen, '',
+    '--- BESONDERHEITEN ---',
+    d.besonderheiten, '',
+    '=== ENDE ERFASSUNGSBOGEN ==='
+  ].join('\n');
+
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;width:1px;height:1px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    showToast('Daten kopiert — jetzt im Chat einfügen');
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(function() {
+      showToast('Daten kopiert — jetzt im Chat einfügen');
+    }).catch(fallback);
+  } else {
+    fallback();
+  }
+}
+
+// ── Export PDF ──
+function expPDF() {
+  if (!window.jspdf) {
+    showToast('PDF-Bibliothek lädt, bitte erneut tippen...');
+    setTimeout(expPDF, 1000);
+    return;
+  }
+  var d = getData();
+  var doc = new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var W=210, M=16, CW=W-2*M;
+  var RED=[147,15,3], NAVY=[27,58,92], DARK=[26,29,35], GRAY=[107,114,128], LIGHT=[244,245,247];
+
+  doc.setFillColor(RED[0],RED[1],RED[2]);
+  doc.roundedRect(M,12,CW,18,3,3,'F');
+  doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text('3DSCAN Solutions GmbH',M+5,22.5);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(255,200,200);
+  doc.text('QM Projekterfassungsbogen  |  V 2.4',M+5,28);
+  doc.text(new Date().toLocaleDateString('de-DE'),W-M-2,28,{align:'right'});
+  doc.setDrawColor(RED[0],RED[1],RED[2]);doc.setLineWidth(0.4);doc.line(M,32,W-M,32);
+
+  var y=38;
+  function sec(title, col) {
+    doc.setFillColor(col[0],col[1],col[2]);
+    doc.roundedRect(M,y,CW,7,2,2,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(255,255,255);
+    doc.text(title,M+4,y+4.8);
+    y+=10;
+  }
+  function row(key, val, alt) {
+    doc.setFillColor(alt?LIGHT[0]:255,alt?LIGHT[1]:255,alt?LIGHT[2]:255);
+    doc.rect(M,y,CW,6,'F');
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(GRAY[0],GRAY[1],GRAY[2]);
+    doc.text(key,M+3,y+4);
+    doc.setFont('helvetica','bold');doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    var lines = doc.splitTextToSize(val, CW-62);
+    doc.text(lines,M+60,y+4);
+    var rh = Math.max(6, lines.length*5);
+    doc.setDrawColor(220,222,228);doc.setLineWidth(0.2);doc.line(M,y+rh,W-M,y+rh);
+    y += rh;
+  }
+
+  sec('PROJEKTDATEN', RED);
+  row('Projektnummer', d.projektnummer, false);
+  row('Auftraggeber', d.auftraggeber, true);
+  row('Prüfer', d.pruefer, false);
+  row('Datum', d.datum, true);
+  row('Revisionsstand', d.revision, false);
+  y+=4;
+
+  sec('NORMEN & KLASSIFIKATION', NAVY);
+  row('Flächennorm', d.norm, false);
+  row('Gebäudetyp', d.gebaeudetyp, true);
+  row('Plantyp', d.plantyp, false);
+  row('Denkmalschutz', d.denkmalschutz, true);
+  row('Maßstab', d.massstab, false);
+  y+=4;
+
+  sec('PLANSET', [59,109,17]);
+  row('Grundrisse', d.grundrisse+' Blatt', false);
+  row('Schnitte', d.schnitte+' Blatt', true);
+  row('Ansichten', d.ansichten+' Blatt', false);
+  row('Detailpläne', d.detailplaene+' Blatt', true);
+  row('Lagepläne', d.lageplaene+' Blatt', false);
+  y+=4;
+
+  sec('KONSTRUKTION', [83,74,183]);
+  row('Zargentyp', d.zargentyp, false);
+  row('Fenstertyp', d.fenstertyp, true);
+  row('Wandkonstruktion', d.wandkonstruktion, false);
+  row('Rollladen', d.rollladen, true);
+  y+=4;
+
+  sec('BESONDERHEITEN', DARK);
+  var bLines = doc.splitTextToSize(d.besonderheiten, CW-6);
+  var bH = Math.max(12, bLines.length*5+6);
+  doc.setFillColor(LIGHT[0],LIGHT[1],LIGHT[2]);
+  doc.rect(M,y,CW,bH,'F');
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  doc.text(bLines,M+3,y+5);
+  y += bH+6;
+
+  if(y>240) doc.addPage();
+  doc.setDrawColor(GRAY[0],GRAY[1],GRAY[2]);doc.setLineWidth(0.3);doc.line(M,y,W-M,y);
+  y+=7;
+  doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  doc.text('FREIGABE & UNTERSCHRIFT',M,y);y+=5;
+  var t3=CW/3;
+  ['Datum','Unterschrift Auftraggeber','Freigabe QM · 3DSCAN'].forEach(function(lb,i){
+    var x=M+i*t3;
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(GRAY[0],GRAY[1],GRAY[2]);
+    doc.text(lb,x+2,y+3);
+    doc.setDrawColor(DARK[0],DARK[1],DARK[2]);doc.setLineWidth(0.5);
+    doc.line(x+2,y+13,x+t3-4,y+13);
+  });
+
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(GRAY[0],GRAY[1],GRAY[2]);
+  doc.text('3DSCAN Solutions GmbH · Am Büchele 2, 86919 Hoffstetten · www.3dscan-solutions.de · QM EBSK',W/2,285,{align:'center'});
+
+  var fname='QM_Erfassungsbogen_'+(d.projektnummer!=='—'?d.projektnummer.replace(/[^a-zA-Z0-9_-]/g,'_'):'Neu')+'.pdf';
+  doc.save(fname);
+}
+
+/* ── Safari iOS Touch Fix ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var tapping = false;
+  function findBtn(el) {
+    while (el && el !== document.body) {
+      if (el.tagName === 'BUTTON' && typeof el.onclick === 'function') return el;
+      el = el.parentNode;
+    }
+    return null;
+  }
+  document.addEventListener('touchstart', function(e) {
+    var btn = findBtn(e.target);
+    if (!btn) return;
+    tapping = true;
+    btn.onclick(e);
+  }, {passive: true});
+  document.addEventListener('click', function(e) {
+    if (tapping) { tapping = false; return; }
+  }, false);
+});
+</script>
+</head>
+
+
+<body>
+<div class="app">
+
+<!-- Header -->
+<div class="hdr">
+  <img class="logo" src="data:image/jpeg;base64,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" alt="3DSCAN Solutions GmbH">
+  <div class="hdr-r">
+    <div class="ltog">
+      <button class="lbtn on" id="btn-de" onclick="setLang('de')">DE</button>
+      <button class="lbtn" id="btn-tr" onclick="setLang('tr')">TR</button>
+    </div>
+    <button class="dtog" onclick="toggleDark()" id="dtog-btn">
+      <span class="dtog-lbl" id="dtog-lbl" data-de="Dark" data-tr="Dark">Dark</span>
+      <div class="dtog-trk"><div class="dtog-knob"></div></div>
+    </button>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="prog-trk"><div class="prog-fill" id="prog" style="width:20%"></div></div>
+
+<!-- Step pills -->
+<div class="steps">
+  <button class="step active" id="sp0" onclick="gS(0)"><span class="step-n">1</span><span class="step-l" id="sl0" data-de="Projektdaten" data-tr="Proje Verisi">Projektdaten</span></button>
+  <button class="step" id="sp1" onclick="gS(1)"><span class="step-n">2</span><span class="step-l" id="sl1" data-de="Normen & Typ" data-tr="Norm & Tip">Normen &amp; Typ</span></button>
+  <button class="step" id="sp2" onclick="gS(2)"><span class="step-n">3</span><span class="step-l" id="sl2" data-de="Planset" data-tr="Plan Seti">Planset</span></button>
+  <button class="step" id="sp3" onclick="gS(3)"><span class="step-n">4</span><span class="step-l" id="sl3" data-de="Konstruktion" data-tr="Yapım">Konstruktion</span></button>
+  <button class="step" id="sp4" onclick="gS(4);bldSum()"><span class="step-n">5</span><span class="step-l" id="sl4" data-de="Freigabe" data-tr="Onay">Freigabe</span></button>
+</div>
+
+<!-- ===== SCHRITT 1 ===== -->
+<div class="sec on" id="s0">
+  <div class="pageerr" id="pe0">Pflichtfelder nicht ausgefüllt — bitte alle markierten Felder ausfüllen um fortzufahren.</div>
+  <div class="two">
+    <div class="col-main">
+      <div class="card">
+        <div class="card-h" id="h-proj" data-de="Projektidentifikation" data-tr="Proje Kimliği">Projektidentifikation</div>
+        <div class="card-desc" id="d-proj" data-de="Pflichtfelder für den QM-Bericht. Ohne vollständige Angaben kann keine Prüfung gestartet werden." data-tr="Tüm dört alan zorunludur — eksik bilgilerle QM başlatılamaz.">Pflichtfelder für den QM-Bericht. Ohne vollständige Angaben kann keine Prüfung gestartet werden.</div>
+        <div class="g2" style="margin-bottom:11px">
+          <div class="fld"><label id="l-pnr" data-de="Projektnummer" data-tr="Proje Numarası">Projektnummer <span class="req">*</span></label><input id="projnr" oninput="clearErr('e-pnr',this)" data-ph-de="EST-000_Muster" data-ph-tr="EST-000_Örnek" type="text" placeholder="EST-000_Muster" autocomplete="off">
+            <div class="ferr" id="e-pnr">Projektnummer eingeben</div></div>
+          <div class="fld"><label id="l-dat" data-de="Berichtsdatum" data-tr="Rapor Tarihi">Berichtsdatum <span class="req">*</span></label><input id="datum" oninput="clearErr('e-dat',this)" type="date">
+            <div class="ferr" id="e-dat">Datum auswählen</div></div>
+        </div>
+        <div class="g2">
+          <div class="fld"><label id="l-ag" data-de="Auftraggeber" data-tr="İşveren">Auftraggeber <span class="req">*</span></label><input id="auftrg" oninput="clearErr('e-ag',this)" data-ph-de="Name / Firma" data-ph-tr="Ad / Firma" type="text" id="ph-ag" placeholder="Name / Firma" autocomplete="off">
+            <div class="ferr" id="e-ag">Auftraggeber eingeben</div></div>
+          <div class="fld"><label id="l-pr" data-de="Prüfer / Kürzel" data-tr="Denetçi / Kısaltma">Prüfer / Kürzel <span class="req">*</span></label><input id="pruefer" oninput="clearErr('e-pr',this)" data-ph-de="z.B. KB" data-ph-tr="örn. KB" type="text" placeholder="z.B. KB" autocomplete="off">
+            <div class="ferr" id="e-pr">Prüfer / Kürzel eingeben</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="h-rev" data-de="Revisionsstand" data-tr="Revizyon Durumu">Revisionsstand <span class="req">*</span></div>
+        <div class="card-desc" id="d-rev" data-de="Erstlieferung oder Korrekturversion?" data-tr="İlk teslimat mı yoksa düzeltme sürümü mü?">Gibt an ob dies die Erstlieferung oder eine Korrekturversion ist.</div>
+        <div class="chips">
+          <button class="chip" id="ch-re0" data-de="RE00 — Erstlieferung" data-tr="RE00 — İlk Teslimat" onclick="pickChip('rev',0)">RE00 — Erstlieferung</button>
+          <button class="chip" id="ch-re1" data-de="RE01 — 1. Korrektur" data-tr="RE01 — 1. Düzeltme" onclick="pickChip('rev',1)">RE01 — 1. Korrektur</button>
+          <button class="chip" id="ch-re2" data-de="RE02 — 2. Korrektur" data-tr="RE02 — 2. Düzeltme" onclick="pickChip('rev',2)">RE02 — 2. Korrektur</button>
+          <button class="chip" id="ch-re3" data-de="RE03+" data-tr="RE03+" onclick="pickChip('rev',3)">RE03+</button>
+        
+      <div class="ferr" id="e-rev">Revisionsstand auswählen</div>
+      </div>
+    </div>
+    </div>
+    <div class="col-ctx">
+      <div class="ctx">
+        <div class="ctx-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="cx-pnr-h" data-de="Projektnummer" data-tr="Proje Numarası">Projektnummer</span></div>
+        <div class="ctx-body" id="cx-pnr-b" data-de="Schema <strong>EST-000_Name</strong> vergeben — eindeutig und nachverfolgbar im Archiv." data-tr="Şema <strong>EST-000_Ad</strong> — arşivde benzersiz ve izlenebilir.">Schema <strong>EST-000_Name</strong> vergeben — eindeutig und nachverfolgbar im Archiv.</div>
+      </div>
+      <div class="ctx">
+        <div class="ctx-h"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span id="cx-rev-h" data-de="Revisionslogik" data-tr="Revizyon Mantığı">Revisionslogik</span></div>
+        <div class="ctx-body"><div class="ctx-list">
+          <div class="ctx-item"><div class="ctx-dot"></div><span id="cx-r0" data-de="<strong>RE00</strong> — Erstlieferung vom Planer" data-tr="<strong>RE00</strong> — Planlayıcıdan ilk teslimat"><strong>RE00</strong> — Erstlieferung vom Planer</span></div>
+          <div class="ctx-item"><div class="ctx-dot"></div><span id="cx-r1" data-de="<strong>RE01+</strong> — Nach QM-Prüfung korrigiert" data-tr="<strong>RE01+</strong> — QM denetiminden sonra düzeltildi"><strong>RE01+</strong> — Nach QM-Prüfung korrigiert</span></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <span class="si" id="si0" data-de="Schritt 1 von 5" data-tr="Adım 1 / 5">Schritt 1 von 5</span>
+    <button class="btn btn-red" id="next0" onclick="gS(1)"><span id="lb-nxt" data-de="Weiter →" data-tr="İleri →">Weiter →</span></button>
+  </div>
+</div>
+
+<!-- ===== SCHRITT 2 ===== -->
+<div class="sec" id="s1">
+  <div class="pageerr" id="pe1">Pflichtfelder nicht ausgefüllt — bitte alle markierten Felder auswählen um fortzufahren.</div>
+  <div class="two">
+    <div class="col-main">
+      <div class="card">
+        <div class="card-h" id="h-norm" data-de="Flächenberechnungsnorm" data-tr="Alan Hesaplama Normu">Flächenberechnungsnorm <span class="req">*</span></div>
+        <div class="card-desc" id="d-norm" data-de="Legt fest nach welchem Regelwerk die Flächen geprüft werden." data-tr="Alanların hangi kurallara göre kontrol edileceğini belirler.">Legt fest nach welchem Regelwerk die Flächen im QM-Bericht geprüft werden.</div>
+        <div class="chips">
+          <button class="chip" id="ch-n0" data-de="DIN 277" data-tr="DIN 277" onclick="pickChip('norm',0)">DIN 277</button>
+          <button class="chip" id="ch-n1" data-de="WoFlV" data-tr="WoFlV" onclick="pickChip('norm',1)">WoFlV</button>
+        </div>
+        <div class="ferr" id="e-norm">Norm auswählen</div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="h-geb" data-de="Gebäudetyp" data-tr="Bina Tipi">Gebäudetyp <span class="req">*</span></div>
+        <div class="card-desc" id="d-geb" data-de="Aktiviert typspezifische Prüfregeln." data-tr="Türe özgü denetim kurallarını etkinleştirir.">Aktiviert typspezifische Prüfregeln im QM-Prozess.</div>
+        <div class="chips">
+          <button class="chip" id="ch-g0" data-de="EFH" data-tr="Tek Aile Evi" onclick="pickChip('geb',0)">EFH</button>
+          <button class="chip" id="ch-g1" data-de="MFH" data-tr="Çok Aile Evi" onclick="pickChip('geb',1)">MFH</button>
+          <button class="chip" id="ch-g2" data-de="Gewerbe" data-tr="Ticari" onclick="pickChip('geb',2)">Gewerbe</button>
+          <button class="chip" id="ch-g3" data-de="Büro / Verwaltung" data-tr="Ofis / İdare" onclick="pickChip('geb',3)">Büro / Verwaltung</button>
+          <button class="chip" id="ch-g4" data-de="Sonderbau" data-tr="Özel Yapı" onclick="pickChip('geb',4)">Sonderbau</button>
+          <button class="chip" id="ch-g5" data-de="Industrie" data-tr="Endüstri" onclick="pickChip('geb',5)">Industrie</button>
+        </div>
+        <div class="ferr" id="e-geb">Gebäudetyp auswählen</div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="h-plan" data-de="Plantyp" data-tr="Plan Türü">Plantyp <span class="req">*</span></div>
+        <div class="card-desc" id="d-plan" data-de="Steuert welche Elemente im Plan Pflicht sind." data-tr="Planda hangi öğelerin zorunlu olduğunu belirler.">Steuert welche Elemente im Plan Pflicht sind.</div>
+        <div class="chips">
+          <button class="chip" id="ch-p0" data-de="Bestand / Digitalisierung" data-tr="Mevcut / Dijitalleştirme" onclick="pickChip('plan',0)">Bestand / Digitalisierung</button>
+          <button class="chip" id="ch-p1" data-de="Entwurf" data-tr="Taslak" onclick="pickChip('plan',1)">Entwurf</button>
+          <button class="chip" id="ch-p2" data-de="LPH 3" data-tr="LPH 3" onclick="pickChip('plan',2)">LPH 3</button>
+          <button class="chip" id="ch-p3" data-de="LPH 4" data-tr="LPH 4" onclick="pickChip('plan',3)">LPH 4</button>
+          <button class="chip" id="ch-p4" data-de="LPH 5" data-tr="LPH 5" onclick="pickChip('plan',4)">LPH 5</button>
+        </div>
+        <div class="ferr" id="e-plan">Plantyp auswählen</div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="h-denk" data-de="Denkmalschutz" data-tr="Tarihi Koruma">Denkmalschutz <span class="req">*</span></div>
+        <div class="card-hint" id="hint-denk" data-de="<strong>Ensemble</strong> = Mehrere Gebäude gemeinsam unter Denkmalschutz (z.B. Hofanlage). Behörde behandelt abweichend vom Einzeldenkmal." data-tr="<strong>Ensemble</strong> = Birden fazla yapı birlikte koruma altında (örn. çiftlik, tarihi kent bölgesi)."><strong>Ensemble</strong> = Mehrere Gebäude gemeinsam unter Denkmalschutz (z.B. Hofanlage). Behörde behandelt dies abweichend vom Einzeldenkmal.</div>
+        <div class="chips">
+          <button class="chip" id="ch-d0" data-de="Nein" data-tr="Hayır" onclick="pickChip('denk',0);denkShow(false)">Nein</button>
+          <button class="chip" id="ch-d1" data-de="Ja" data-tr="Evet" onclick="pickChip('denk',1);denkShow(true)">Ja</button>
+          <button class="chip" id="ch-d2" data-de="Ensemble" data-tr="Ensemble" onclick="pickChip('denk',2);denkShow(true)">Ensemble</button>
+        </div>
+        <div class="ferr" id="e-denk">Denkmalschutz auswählen</div>
+        <div class="info" id="denk-info" data-de="<strong>Block C wird erweitert</strong> auf „Bestand &amp; Denkmalschutz&quot; (+14 Pflichtpunkte)." data-tr="<strong>Blok C genişletiliyor</strong>: „Mevcut &amp; Tarihi Koruma&quot; (+14 zorunlu nokta)." style="display:none" id="dx-info" data-de="<strong>Block C wird erweitert</strong> auf „Bestand &amp; Denkmalschutz&quot; (+14 Pflichtpunkte)." data-tr="<strong>Blok C genişletiliyor</strong>: „Mevcut &amp; Tarihi Koruma&quot; (+14 zorunlu nokta)."><strong>Block C wird erweitert</strong> auf „Block C — Bestand &amp; Denkmalschutz" (+14 Pflichtpunkte).</div>
+      </div>
+    </div>
+    <div class="col-ctx">
+      <div class="ctx">
+        <div class="ctx-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>DIN 277 vs. WoFlV</span></div>
+        <div class="ctx-body"><div class="ctx-list">
+          <div class="ctx-item"><div class="ctx-dot"></div><span><strong>DIN 277</strong> — Neubau, Gewerbe, behördliche Einreichung</span></div>
+          <div class="ctx-item"><div class="ctx-dot"></div><span><strong>WoFlV</strong> — Wohnfläche bei Verkauf / Vermietung (Notar)</span></div>
+        </div></div>
+      </div>
+      <div class="ctx">
+        <div class="ctx-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Denkmalschutz</span></div>
+        <div class="ctx-body">Bei <strong>Ja</strong> oder <strong>Ensemble</strong> werden 14 zusätzliche Prüfpunkte aktiv. Alle Pläne müssen vor Einreichung bei der Behörde vollständig sein.</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="btn" onclick="gS(0)">← <span id="lb-bk" data-de="← Zurück" data-tr="← Geri">Zurück</span></button>
+    <span class="si" id="si1" data-de="Schritt 2 von 5" data-tr="Adım 2 / 5">Schritt 2 von 5</span>
+    <button class="btn btn-red" onclick="gS(2)"><span>Weiter</span> →</button>
+  </div>
+</div>
+
+<!-- ===== SCHRITT 3 ===== -->
+<div class="sec" id="s2">
+  <div class="pageerr" id="pe2">Pflichtfeld nicht ausgefüllt — bitte den Maßstab auswählen um fortzufahren.</div>
+  <div class="two">
+    <div class="col-main">
+      <div class="card">
+        <div class="card-h" id="h-pset" data-de="Planblätter — Anzahl je Typ" data-tr="Plan Yaprakları — Her Türden Adet">Planblätter — Anzahl je Typ</div>
+        <div class="card-desc" id="d-pset" data-de="Steuert welche Quervergleiche im QM-Bericht möglich sind." data-tr="QM raporunda hangi karşılaştırmaların mümkün olduğunu belirler.">Anzahl der gelieferten Blätter. Steuert welche Quervergleiche im QM-Bericht möglich sind.</div>
+        <div class="ctr"><div class="ctr-i"><div class="ctr-name" id="cn-gr" data-de="Grundrisse" data-tr="Planlar">Grundrisse</div><div class="ctr-sub" id="cs-gr" data-de="alle Geschosse" data-tr="tüm katlar">alle Geschosse</div></div><div class="ctr-ctrl"><button class="cbtn" onclick="adj('vgr',-1)">−</button><div class="cval" id="vgr">2</div><button class="cbtn" onclick="adj('vgr',1)">+</button></div></div>
+        <div class="ctr"><div class="ctr-i"><div class="ctr-name" id="cn-sn" data-de="Schnitte" data-tr="Kesitler">Schnitte</div><div class="ctr-sub" id="cs-sn" data-de="Längs- und Querschnitte" data-tr="Boy ve enine kesitler">Längs- und Querschnitte</div></div><div class="ctr-ctrl"><button class="cbtn" onclick="adj('vsn',-1)">−</button><div class="cval z" id="vsn">0</div><button class="cbtn" onclick="adj('vsn',1)">+</button></div></div>
+        <div class="ctr"><div class="ctr-i"><div class="ctr-name" id="cn-an" data-de="Ansichten" data-tr="Görünüşler">Ansichten</div><div class="ctr-sub" id="cs-an" data-de="alle Himmelsrichtungen" data-tr="tüm yönler">alle Himmelsrichtungen</div></div><div class="ctr-ctrl"><button class="cbtn" onclick="adj('van',-1)">−</button><div class="cval z" id="van">0</div><button class="cbtn" onclick="adj('van',1)">+</button></div></div>
+        <div class="ctr"><div class="ctr-i"><div class="ctr-name" id="cn-det" data-de="Detailpläne" data-tr="Detay Planları">Detailpläne</div><div class="ctr-sub" id="cs-det" data-de="Zargen, Fensterdetails 1:50" data-tr="Kasalar, pencere detayları 1:50">Zargen, Fensterdetails 1:50</div></div><div class="ctr-ctrl"><button class="cbtn" onclick="adj('vdet',-1)">−</button><div class="cval z" id="vdet">0</div><button class="cbtn" onclick="adj('vdet',1)">+</button></div></div>
+        <div class="ctr"><div class="ctr-i"><div class="ctr-name" id="cn-lag" data-de="Lagepläne" data-tr="Vaziyet Planları">Lagepläne</div></div><div class="ctr-ctrl"><button class="cbtn" onclick="adj('vlag',-1)">−</button><div class="cval z" id="vlag">0</div><button class="cbtn" onclick="adj('vlag',1)">+</button></div></div>
+        <div class="warn" id="sn-warn" data-de="<strong>Keine Schnitte angegeben</strong> — Raumhöhenvergleich nicht möglich." data-tr="<strong>Kesit belirtilmedi</strong> — Oda yüksekliği karşılaştırması yapılamaz." style="display:none" id="w-sn" data-de="<strong>Keine Schnitte angegeben</strong> — Raumhöhenvergleich nicht möglich." data-tr="<strong>Kesit belirtilmedi</strong> — Oda yüksekliği karşılaştırması yapılamaz."><strong>Keine Schnitte angegeben</strong> — Raumhöhen und Geschosshöhenvergleich können nicht verifiziert werden.</div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="h-mst" data-de="Maßstab" data-tr="Ölçek">Maßstab <span class="req">*</span></div>
+        <div class="card-desc" id="d-mst" data-de="Ab 1:50 sind Zargen und Öffnungsrichtungen Pflicht." data-tr="1:50'den itibaren kasalar ve açılış yönleri zorunludur.">Ab 1:50 sind Zargen und Öffnungsrichtungen Pflicht.</div>
+        <div class="chips">
+          <button class="chip" id="ch-m0" data-de="1:200" data-tr="1:200" onclick="pickChip('mst',0)">1:200</button>
+          <button class="chip" id="ch-m1" data-de="1:100" data-tr="1:100" onclick="pickChip('mst',1)">1:100</button>
+          <button class="chip" id="ch-m2" data-de="1:50" data-tr="1:50" onclick="pickChip('mst',2)">1:50</button>
+          <button class="chip" id="ch-m3" data-de="1:20+" data-tr="1:20+" onclick="pickChip('mst',3)">1:20+</button>
+          <button class="chip" id="ch-m4" data-de="Gemischt" data-tr="Karışık" onclick="pickChip('mst',4)">Gemischt</button>
+        </div>
+        <div class="ferr" id="e-mst">Maßstab auswählen</div>
+      </div>
+    </div>
+    <div class="col-ctx">
+      <div class="ctx">
+        <div class="ctx-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Darstellungspflichten</span></div>
+        <div class="ctx-body"><div class="ctx-list">
+          <div class="ctx-item"><div class="ctx-dot"></div><span><strong>1:100</strong> — Öffnungsrichtung empfohlen, Zargen nicht Pflicht</span></div>
+          <div class="ctx-item"><div class="ctx-dot"></div><span id="ctx-mst-1" data-de="<strong>1:50</strong> — Zargen + Öffnungsrichtung <strong>Pflicht</strong>" data-tr="<strong>1:50</strong> — Kasalar + Açılış yönü <strong>Zorunlu</strong>"><strong>1:50</strong> — Zargen + Öffnungsrichtung <strong>Pflicht</strong></span></div>
+          <div class="ctx-item"><div class="ctx-dot"></div><span>Ohne <strong>Schnitte</strong> kein Raumhöhenvergleich möglich</span></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="btn" onclick="gS(1)">← <span>Zurück</span></button>
+    <span class="si" id="si2" data-de="Schritt 3 von 5" data-tr="Adım 3 / 5">Schritt 3 von 5</span>
+    <button class="btn btn-red" onclick="gS(3)">Weiter →</button>
+  </div>
+</div>
+
+<!-- ===== SCHRITT 4 ===== -->
+<div class="sec" id="s3">
+  <div class="pageerr" id="pe3">Pflichtfeld nicht ausgefüllt — bitte die Besonderheiten eintragen um fortzufahren.</div>
+  <div class="two">
+    <div class="col-main">
+      <div class="card">
+        <div class="card-h" id="h-zrg" data-de="Tür-Zargentyp" data-tr="Kapı Kasası Tipi">Tür-Zargentyp <span style="font-size:10px;text-transform:none;font-weight:400;letter-spacing:0;margin-left:4px;color:var(--mu)" id="ml-zrg" data-de="Mehrfachauswahl" data-tr="Çoklu Seçim">Mehrfachauswahl</span></div>
+        <div class="chips">
+          <button class="chip" id="ch-z0" data-de="Umfassungszargen" data-tr="Çevreleyen Kasalar" onclick="togChip(this)">Umfassungszargen</button>
+          <button class="chip" id="ch-z1" data-de="Blockzargen" data-tr="Blok Kasalar" onclick="togChip(this)">Blockzargen</button>
+          <button class="chip" id="ch-z2" data-de="Stahlzargen" data-tr="Çelik Kasalar" onclick="togChip(this)">Stahlzargen</button>
+          <button class="chip" id="ch-z3" data-de="Keine" data-tr="Yok" onclick="togChip(this)">Keine</button>
+          <button class="chip" id="ch-z4" data-de="Gemischt / Unbekannt" data-tr="Karışık / Bilinmiyor" onclick="togChip(this)">Gemischt / Unbekannt</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="h-fen" data-de="Fenster-Öffnungstyp" data-tr="Pencere Açılış Tipi">Fenster-Öffnungstyp <span style="font-size:10px;text-transform:none;font-weight:400;letter-spacing:0;margin-left:4px;color:var(--mu)" id="ml-fen" data-de="Mehrfachauswahl" data-tr="Çoklu Seçim">Mehrfachauswahl</span></div>
+        <div class="chips">
+          <button class="chip" id="ch-f0" data-de="Dreh-Kipp (DK)" data-tr="Devir-Devril (DK)" onclick="togChip(this)">Dreh-Kipp (DK)</button>
+          <button class="chip" id="ch-f1" data-de="Dreh (D)" data-tr="Devir (D)" onclick="togChip(this)">Dreh (D)</button>
+          <button class="chip" id="ch-f2" data-de="Schiebe (S)" data-tr="Sürgü (S)" onclick="togChip(this)">Schiebe (S)</button>
+          <button class="chip" id="ch-f3" data-de="Feststehend (F)" data-tr="Sabit (F)" onclick="togChip(this)">Feststehend (F)</button>
+          <button class="chip" id="ch-f4" data-de="Historisch / Bestand" data-tr="Tarihi / Mevcut" onclick="togChip(this)">Historisch / Bestand</button>
+          <button class="chip" id="ch-f5" data-de="Unbekannt" data-tr="Bilinmiyor" onclick="togChip(this)">Unbekannt</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="h-wnd" data-de="Wandkonstruktion" data-tr="Duvar Yapısı">Wandkonstruktion <span style="font-size:10px;text-transform:none;font-weight:400;letter-spacing:0;margin-left:4px;color:var(--mu)" id="ml-wnd" data-de="nur falls bekannt" data-tr="yalnızca biliniyorsa">nur falls bekannt</span></div>
+        <div class="card-hint" id="hint-wnd" data-de="Im Bestand oft nicht erkennbar — nur ausfüllen wenn bekannt. Kein Pflichtfeld." data-tr="Mevcut yapıda genellikle görülmez — yalnızca biliniyorsa doldurun. Zorunlu alan değil.">Im Bestand oft nicht erkennbar — nur ausfüllen wenn bekannt. Leeres Feld erzeugt keine Pflicht-Markierung.</div>
+        <div class="chips">
+          <button class="chip" id="ch-w0" data-de="Massivmauerwerk" data-tr="Yığma Kargir" onclick="togChip(this)">Massivmauerwerk</button>
+          <button class="chip" id="ch-w1" data-de="Naturstein" data-tr="Doğal Taş" onclick="togChip(this)">Naturstein</button>
+          <button class="chip" id="ch-w2" data-de="Stahlbeton" data-tr="Betonarme" onclick="togChip(this)">Stahlbeton</button>
+          <button class="chip" id="ch-w3" data-de="Holzständer" data-tr="Ahşap Çerçeve" onclick="togChip(this)">Holzständer</button>
+          <button class="chip" id="ch-w4" data-de="Fachwerk" data-tr="Yarım Ahşap" onclick="togChip(this)">Fachwerk</button>
+          <button class="chip" id="ch-w5" data-de="Gemischt" data-tr="Karışık" onclick="togChip(this)">Gemischt</button>
+          <button class="chip" id="ch-w6" data-de="Nicht erkennbar" data-tr="Tanımlanamıyor" onclick="togChip(this)">Nicht erkennbar</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="h-rl" data-de="Rollladen / Sonnenschutz" data-tr="Panjur / Güneş Koruması">Rollladen / Sonnenschutz</div>
+        <div class="chips">
+          <button class="chip" id="ch-rl0" data-de="Ja — motorisiert" data-tr="Evet — motorlu" onclick="pickChip('rl',0)">Ja — motorisiert</button>
+          <button class="chip" id="ch-rl1" data-de="Ja — manuell" data-tr="Evet — manuel" onclick="pickChip('rl',1)">Ja — manuell</button>
+          <button class="chip" id="ch-rl2" data-de="Teilweise" data-tr="Kısmen" onclick="pickChip('rl',2)">Teilweise</button>
+          <button class="chip" id="ch-rl3" data-de="Nein" data-tr="Hayır" onclick="pickChip('rl',3)">Nein</button>
+          <button class="chip" id="ch-rl4" data-de="Unbekannt" data-tr="Bilinmiyor" onclick="pickChip('rl',4)">Unbekannt</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h" id="h-be" data-de="Projektspezifische Besonderheiten" data-tr="Projeye Özel Özellikler">Projektspezifische Besonderheiten <span class="req">*</span></div>
+        <div class="card-desc" id="d-be" data-de="Alle projektspezifischen Abweichungen dokumentieren — erscheint als Kontext im QM-Bericht." data-tr="Tüm sapmaları belgeleyin — QM raporunda bağlam olarak görünür.">Alle Abweichungen vom Standardfall dokumentieren. Erscheint als Kontext im QM-Bericht.</div>
+        <div class="fld"><textarea id="besond" oninput="clearErr('e-be',this)" data-ph-de="z.B. Wintergarten EG, Garage UG, Baugenehmigungsvorbehalt Raum 6, Dachgauben, Lichtschächte&#10;&#10;Leeres Feld = unvollständige Eingabe." data-ph-tr="örn. Kış bahçesi ZK, Garaj BK, Oda 6 ruhsat çekincesi, Çatı pencereleri&#10;&#10;Boş alan = eksik giriş." placeholder="z.B. Wintergarten EG, Garage UG, Baugenehmigungsvorbehalt Raum 6, Dachgauben, Lichtschächte&#10;&#10;Leeres Feld = unvollständige Eingabe."></textarea>
+          <div class="ferr" id="e-be">Besonderheiten eintragen (oder „Keine" eingeben)</div></div>
+      </div>
+    </div>
+    <div class="col-ctx">
+      <div class="ctx">
+        <div class="ctx-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Zargen im Maßstab</span></div>
+        <div class="ctx-body"><div class="ctx-list">
+          <div class="ctx-item"><div class="ctx-dot"></div><span><strong>1:100</strong> — Keine Zargen notwendig</span></div>
+          <div class="ctx-item"><div class="ctx-dot"></div><span><strong>1:50</strong> — Umfassungszargen <strong>Pflicht</strong> (je ca. 5–8 cm)</span></div>
+        </div></div>
+      </div>
+      <div class="ctx">
+        <div class="ctx-h"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Besonderheiten-Pflicht</span></div>
+        <div class="ctx-body"><div class="ctx-list">
+          <div class="ctx-item"><div class="ctx-dot"></div><span id="ctx-be-0" data-de="Wintergarten → WoFlV §4 Abs. 3" data-tr="Kış bahçesi → WoFlV §4 fıkra 3">Wintergarten → WoFlV §4 Abs. 3</span></div>
+          <div class="ctx-item"><div class="ctx-dot"></div><span>Kellerraum → BayBO-Nachweis erforderlich</span></div>
+          <div class="ctx-item"><div class="ctx-dot"></div><span>Dachgauben → Ansicht und GR prüfen</span></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="btn" onclick="gS(2)">← Zurück</button>
+    <span class="si" id="si3" data-de="Schritt 4 von 5" data-tr="Adım 4 / 5">Schritt 4 von 5</span>
+    <button class="btn btn-red" onclick="gS(4);bldSum()">Zur Freigabe →</button>
+  </div>
+</div>
+
+<!-- ===== SCHRITT 5 ===== -->
+<div class="sec" id="s4">
+  <div class="sg" id="sum-grid"></div>
+  <div class="card">
+    <div class="card-h" id="h-blks" data-de="Aktive QM-Prüfblöcke" data-tr="Aktif QM Kontrol Blokları">Aktive QM-Prüfblöcke</div>
+    <div class="blks" id="sum-blks"></div>
+  </div>
+  <div id="sum-warns"></div>
+  <div class="card" style="margin-top:10px">
+    <div class="card-h" id="h-sig" data-de="Freigabe &amp; Unterschrift" data-tr="Onay &amp; İmza">Freigabe &amp; Unterschrift</div>
+    <div class="sig">
+      <div class="sig-f"><div class="sig-l" id="sl-dat" data-de="Datum" data-tr="Tarih">Datum</div><div class="sig-line"></div></div>
+      <div class="sig-f"><div class="sig-l" id="sl-ug" data-de="Unterschrift Auftraggeber" data-tr="İşveren İmzası">Unterschrift Auftraggeber</div><div class="sig-line"></div></div>
+      <div class="sig-f"><div class="sig-l" id="sl-qm" data-de="Freigabe QM · 3DSCAN" data-tr="QM Onayı · 3DSCAN">Freigabe QM · 3DSCAN</div><div class="sig-line"></div></div>
+    </div>
+  </div>
+  <div class="exbox">
+    <div class="exh" id="h-ex" data-de="Export &amp; QM starten" data-tr="Dışa Aktar &amp; QM Başlat">Export &amp; QM starten</div>
+    <p class="exd" id="d-ex" data-de="<strong>PDF speichern</strong> — druckfertiges Dokument mit Logo und allen Angaben.<br><strong>Für QM-Chat kopieren</strong> — Daten in Zwischenablage, im Claude-Chat einfügen." data-tr="<strong>PDF kaydet</strong> — logo ve tüm bilgileri içeren belge.<br><strong>QM-Sohbet için kopyala</strong> — verileri panoya kopyalar, Claude sohbetine yapıştırın.">
+      <strong>PDF speichern</strong> — druckfertiges Dokument mit Logo und allen Angaben.<br>
+      <strong>Für QM-Chat kopieren</strong> — Daten in Zwischenablage, dann im Claude-Chat einfügen (<kbd>Strg+V</kbd> / Tippen &amp; halten).
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-red btn-full" onclick="expPDF()">
+        <svg width="15" height="15" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <span id="lb-pdf" data-de="PDF speichern" data-tr="PDF kaydet">PDF speichern</span>
+      </button>
+      <button class="btn btn-navy btn-full" onclick="expChat()">
+        <svg width="15" height="15" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><rect x="8" y="8" width="12" height="14" rx="2"/><path d="M4 16V4a2 2 0 012-2h10"/></svg>
+        <span id="lb-cpy" data-de="Für QM-Chat kopieren" data-tr="QM-Sohbet için kopyala">Für QM-Chat kopieren</span>
+      </button>
+    </div>
+  </div>
+  <div class="nav" style="margin-top:12px">
+    <button class="btn" onclick="gS(3)">← Zurück</button>
+    <span class="si" id="si4" data-de="Schritt 5 von 5" data-tr="Adım 5 / 5">Schritt 5 von 5</span>
+    <button class="btn btn-green" onclick="expChat();expPDF()"><span id="lb-start" data-de="✓ QM-Prüfung starten" data-tr="✓ QM Kontrolünü Başlat">✓ QM-Prüfung starten</span></button>
+  </div>
+</div>
+
+</div>
+<div class="ver">V 2.4 · QM EBSK</div>
+<div class="toast" id="toast">Daten kopiert</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</body>
+</html>
