@@ -777,25 +777,33 @@ function expPDF() {
 }
 
 /* ── Safari iOS Touch Fix ── */
-document.addEventListener('DOMContentLoaded', function() {
-  var tapping = false;
-  function findBtn(el) {
+(function() {
+  var lastFired = 0;
+
+  function onTouch(e) {
+    var el = e.target;
     while (el && el !== document.body) {
-      if (el.tagName === 'BUTTON' && typeof el.onclick === 'function') return el;
+      if (el.tagName === 'BUTTON' && el.onclick) {
+        e.preventDefault();
+        var now = Date.now();
+        if (now - lastFired < 500) return; /* block double-fire */
+        lastFired = now;
+        el.onclick(e);
+        return;
+      }
       el = el.parentNode;
     }
-    return null;
   }
-  document.addEventListener('touchstart', function(e) {
-    var btn = findBtn(e.target);
-    if (!btn) return;
-    tapping = true;
-    btn.onclick(e);
-  }, {passive: true});
+  document.addEventListener('touchstart', onTouch, {passive: false});
+
+  /* Block the ghost click that follows touchstart within 500ms */
   document.addEventListener('click', function(e) {
-    if (tapping) { tapping = false; return; }
-  }, false);
-});
+    if (Date.now() - lastFired < 500) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }, true); /* capture phase — intercepts before onclick fires */
+})();
 </script>
 </head>
 
